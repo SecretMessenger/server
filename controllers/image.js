@@ -1,21 +1,29 @@
 const stego = require("stegosaurus");
 const fs = require('fs');
+const { Storage } = require('@google-cloud/storage')
+const gcsUpload = require('../middlewares/gcsUpload');
+const uploadImage = require('../helpers/uploadImage');
 
 class ImageController {
     static encode(req, res, next) {
-        const { message_string } = req.body;
-        // var message_string = "asd";  // The encoded message.
+        // const { message_string } = req.body;
+        var message_string = "asd";  // The encoded message.
         let generated_png = req.file.destination + '/encoded/' + req.file.filename;
         stego.encodeString(req.file.path, generated_png, message_string, function (err) {
-          if (err) { throw err; }
-      
-          fs.unlinkSync(req.file.path)
-      
-          res.status(200).json({
-            message: 'Encoded your message to this image.',
-            image: generated_png,
-            message_length: message_string.length // use this when you want to decode the image 
-          })
+          if (err) { next(err) }
+
+            fs.unlinkSync(req.file.path);
+
+            let file = req.file;
+            try {
+                uploadImage({ file })
+                .then(url => {
+                    fs.unlinkSync(generated_png);
+                    res.status(200).json({url});
+                })
+            } catch (error) {
+                next(error)
+            }
         })
     }
 
