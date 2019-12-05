@@ -22,7 +22,7 @@ router.post('/encode', function (req, res, next) {
 })
 
 router.post('/decode', function (req, res, next) {
-  const { message_length } = req.body
+  const { generated_png, message_length } = req.body
 
   stego.decode(generated_png, Number(message_length), function (payload) {
     console.log("Decoded message: ", payload);
