@@ -22,11 +22,13 @@
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "express": "^4.17.1",
+    "future": "^2.3.1",
+    "futures": "^2.3.3",
     "gcs-upload": "^1.1.2",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.7.13",
     "morgan": "^1.9.1",
-    "stegger": "^0.1.1"
+    "stegosaurus": "^0.1.2"
   },
   "devDependencies": {
     "dotenv": "^8.2.0"
