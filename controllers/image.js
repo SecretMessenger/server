@@ -2,27 +2,38 @@ const stego = require("stegosaurus");
 const fs = require('fs');
 const axios = require('axios')
 const uploadImage = require('../helpers/uploadImage');
+const convertToPng = require('../helpers/convertJPGToPNG');
 const ascii = /^[ -~\t\n\r]+$/;
 
 class ImageController {
-    static encode(req, res, next) {
+    static async encode(req, res, next) {
         const { message_string } = req.body;
         let generated_png = req.file.destination + '/encoded/' + req.file.filename;
-        stego.encodeString(req.file.path, generated_png, message_string, function (err) {
-          if (err) { next(err) }
+        let filepath = req.file.path;
 
-            fs.unlinkSync(req.file.path);
+        if (req.file.mimetype === 'image/jpeg') {
+            console.log(filepath)
+            filepath = await convertToPng(req.file);
+        }
+        
+        stego.encodeString(filepath, generated_png, message_string, function (err) {
+          if (err) { next(err) }
+            fs.unlinkSync(filepath);
 
             let file = req.file;
             try {
                 uploadImage({ file })
-                .then(url => {
-                    fs.unlinkSync(generated_png);
-                    res.status(200).json({
-                        url,
-                        password: message_string.length
-                    });
-                })
+                    .then(url => {
+                        fs.unlinkSync(generated_png);
+                        if (filepath !== req.file.path) {
+                            fs.unlinkSync(req.file.path);
+                        }
+                        
+                        res.status(200).json({
+                            url,
+                            password: message_string.length
+                        });
+                    })
             } catch (error) {
                 next(error)
             }
