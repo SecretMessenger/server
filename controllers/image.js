@@ -2,6 +2,7 @@ const stego = require("stegosaurus");
 const fs = require('fs');
 const axios = require('axios')
 const uploadImage = require('../helpers/uploadImage');
+const ascii = /^[ -~\t\n\r]+$/;
 
 class ImageController {
     static encode(req, res, next) {
@@ -32,12 +33,21 @@ class ImageController {
         const { message_length } = req.body;
 
         stego.decode(req.file.path, Number(message_length), function (payload) {
-      
-          res.status(200).json({
-            message: 'Decoded message in your image.',
-            image: req.file.path,
-            decoded_message: payload
-          })
+            fs.unlinkSync(file.path);
+            
+            if ( !ascii.test( payload ) ) {
+                let err = {
+                    status: 400,
+                    msg: 'Wrong passcode'
+                }
+                next(err);
+            } else { 
+                res.status(200).json({
+                    message: 'Decoded message in your image.',
+                    image: req.file.path,
+                    decoded_message: payload
+                })
+            }
         })
     }
 
@@ -62,14 +72,22 @@ class ImageController {
             })
         })
         .then( _=> {
-            
             stego.decode(filepath, Number(message_length), function (payload) {
                 fs.unlinkSync(filepath);
-                res.status(200).json({
-                  message: 'Decoded message in your image.',
-                  image: filepath,
-                  decoded_message: payload
-                })
+
+                if ( !ascii.test( payload ) ) {
+                    let err = {
+                        status: 400,
+                        msg: 'Wrong passcode'
+                    }
+                    next(err);
+                } else {
+                    res.status(200).json({
+                    message: 'Decoded message in your image.',
+                    image: filepath,
+                    decoded_message: payload
+                  })
+                }  
             })
         })
         .catch(next)
