@@ -20,4 +20,6 @@ router.get('/', function (req, res, next) {
 router.post('/encode', upload.single('image'), ImageController.encode);
 router.post('/decode', upload.single('image'), ImageController.decode);
 
+router.post('/decodeUrl', ImageController.decodeUrl);
+
 module.exports = router;
