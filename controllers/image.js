@@ -44,7 +44,7 @@ class ImageController {
         const { message_length } = req.body;
 
         stego.decode(req.file.path, Number(message_length), function (payload) {
-            fs.unlinkSync(file.path);
+            fs.unlinkSync(req.file.path);
             
             if ( !ascii.test( payload ) ) {
                 let err = {
