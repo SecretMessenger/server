@@ -41,9 +41,9 @@ class ImageController {
     }
 
     static decode(req, res, next) {
-        const { message_length } = req.body;
+        const { password } = req.body;
 
-        stego.decode(req.file.path, Number(message_length), function (payload) {
+        stego.decode(req.file.path, Number(password), function (payload) {
             fs.unlinkSync(req.file.path);
             
             if ( !ascii.test( payload ) ) {
@@ -63,7 +63,7 @@ class ImageController {
     }
 
     static decodeUrl(req, res, next) {
-        const { url, message_length } = req.body;
+        const { url, password } = req.body;
         
         let filename = url.split('/')
         filename = filename[filename.length - 1];
@@ -83,7 +83,7 @@ class ImageController {
             })
         })
         .then( _=> {
-            stego.decode(filepath, Number(message_length), function (payload) {
+            stego.decode(filepath, Number(password), function (payload) {
                 fs.unlinkSync(filepath);
 
                 if ( !ascii.test( payload ) ) {
