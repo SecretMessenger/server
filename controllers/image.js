@@ -1,7 +1,5 @@
 const stego = require("stegosaurus");
 const fs = require('fs');
-const { Storage } = require('@google-cloud/storage')
-const gcsUpload = require('../middlewares/gcsUpload');
 const uploadImage = require('../helpers/uploadImage');
 
 class ImageController {
